@@ -1,9 +1,8 @@
 package com.example.lab2;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,10 +10,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
 public class MainActivity2 extends AppCompatActivity {
+
+    private final static String TAG = "MainActivity2";
 
     ArrayList<String> addString;
     ArrayAdapter<String> adapter;
@@ -85,6 +89,49 @@ public class MainActivity2 extends AppCompatActivity {
         selectedString.clear();
 
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
+
+        Toast.makeText(MainActivity2.this, "APP onDestroy", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d(TAG, "onStop");
+
+        Toast.makeText(MainActivity2.this, "APP onStop", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
+        Log.d(TAG, "onStart");
+
+        Toast.makeText(MainActivity2.this, "APP onStart", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onPause(){
+        super.onPause();
+        Log.d(TAG, "onPause");
+        Toast.makeText(MainActivity2.this, "APP onPause", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d(TAG, "onResume");
+
+        Toast.makeText(MainActivity2.this, "APP onResume", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        Log.d(TAG, "onRestart");
+
+        Toast.makeText(MainActivity2.this, "APP onRestart", Toast.LENGTH_SHORT).show();
     }
 
 }

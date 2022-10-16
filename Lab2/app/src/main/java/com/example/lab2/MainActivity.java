@@ -1,21 +1,14 @@
 package com.example.lab2;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(LOGIN, editText1.getText().toString());
                 editor.putString(PASS, editText2.getText().toString());
-                editor.commit();
+                editor.apply();
                 Toast.makeText(MainActivity.this, "Пользователь зарегистрирован", Toast.LENGTH_SHORT).show();
 
             }
