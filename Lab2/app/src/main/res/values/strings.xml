@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">Lab2</string>
-    <string name="butAdd">Добавить</string>
-    <string name="butDel">Удалить</string>
-    <string name="hint">Введите текст</string>
-    <string name="singIn">Войти</string>
-    <string name="singUp">Регистрация</string>
-</resources>
