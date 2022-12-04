@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">Lab1</string>
-    <string name="my_first_app">My First APP!</string>
-    <string name="count">Количество нажатий: 0</string>
-    <string name="tap">Нажми!</string>
-</resources>
