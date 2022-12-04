@@ -1,11 +1,17 @@
 package com.example.lab5;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity2 extends AppCompatActivity {
+
     private final static String TAG = "MainActivity2";
     final String LIST = "list";
     final String STATE = "state";
@@ -33,7 +40,6 @@ public class MainActivity2 extends AppCompatActivity {
     final String PASS = "pass";
 
     List<User> userList;
-    DatabaseHandler db;
     ImageButton imgButton, imgButSettings;
     Button buttonAdd, lang;
     EditText editText;
@@ -47,6 +53,27 @@ public class MainActivity2 extends AppCompatActivity {
     int state = 0;
     int count = 0;
 
+    final Looper looper = Looper.getMainLooper();
+    final Message message = Message.obtain();
+
+    final Handler handler = new Handler(looper) {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.sendingUid == 1) {
+                userList = (List<User>) msg.obj;
+
+                if(userList.size() != 0) {
+                    for (User user : userList) {
+                        String log = "Id: " + user.getID() + " ,Login: " + user.getLogin() + " ,Password: " + user.getPass();
+                        addString.add(log);
+                        adapter.notifyDataSetChanged();
+                        listView.setAdapter(adapter);
+                    }
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +83,6 @@ public class MainActivity2 extends AppCompatActivity {
         String loginToSett = arguments.get("login").toString();
         String passToSett = arguments.get("pass").toString();
 
-        db = new DatabaseHandler(this);
         preferences = getSharedPreferences(loginToSett, MODE_PRIVATE);
         preferences_settings = getSharedPreferences("settings", MODE_PRIVATE);
         addString = new ArrayList<>();
@@ -156,19 +182,7 @@ public class MainActivity2 extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             listView.setAdapter(adapter);
         }
-        new Thread(() -> {
-            Log.i("Thread_MainAct_2", Thread.currentThread().getName());
-            userList = db.getAllUsers();
-            if(userList.size() != 0) {
-                for (User user : userList) {
-                    String log = "Id: " + user.getID() + " ,Login: " + user.getLogin() + " ,Password: " + user.getPass();
-                    //Log.i("Loading...", log);
-                    addString.add(log);
-                    adapter.notifyDataSetChanged();
-                    listView.setAdapter(adapter);
-                }
-            }
-        }).start();
+        new ThreadDB(handler, MainActivity2.this).tGetAllUser();
     }
     public void add(View view){
         EditText editText = findViewById(R.id.edit);

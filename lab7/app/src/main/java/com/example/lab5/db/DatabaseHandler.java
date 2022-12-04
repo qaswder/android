@@ -6,8 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
+
+import com.example.lab5.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +17,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Users.db";
-    private String message = "null";
-    Context context;
-    View view;
+
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
     }
 
     @Override
@@ -40,40 +38,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void addUser(User user, View view) {
-        new Thread(() -> {
-            this.view = view;
-            Log.i("Thread_DB", Thread.currentThread().getName() + " start");
-            SQLiteDatabase sqLiteDatabase = DatabaseHandler.this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            boolean flag = true;
-            List<User> userList;
-            userList = DatabaseHandler.this.getAllUsers();
+    public String addUser(User user) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        String message = "Логин доступен";
+        boolean flag = true;
+        List<User> userList;
+        userList = getAllUsers();
 
-            if (!userList.isEmpty()) {
-                for (User userGetDB : userList) {
-                    String log = userGetDB.getLogin();
-                    Log.i("DB user login ", log + " " + user.getLogin());
-                    if (log.equals(user.getLogin())) {
-                        flag = false;
-                        view.post(() -> Toast.makeText(context, "Логин не доступен", Toast.LENGTH_SHORT).show());
-                        break;
-                    }
+        if (!userList.isEmpty()) {
+            for (User userGetDB : userList) {
+                String log = userGetDB.getLogin();
+                Log.i("DB user login ", log + " " + user.getLogin());
+                if (log.equals(user.getLogin())) {
+                    flag = false;
+                    message = "Логин не доступен";
+                    break;
                 }
-                if (flag == true) {
-                    values.put(DBContract.UserEntry.COLUMN_NAME_LOGIN, user.getLogin());
-                    values.put(DBContract.UserEntry.COLUMN_NAME_PASS, user.getPass());
-                    sqLiteDatabase.insert(DBContract.UserEntry.TABLE_NAME, null, values);
-                    view.post(() ->Toast.makeText(context, "Пользователь зарегистрирован <Логин доступен>", Toast.LENGTH_SHORT).show());
-                }
-            } else {
+            }
+            if (flag == true) {
                 values.put(DBContract.UserEntry.COLUMN_NAME_LOGIN, user.getLogin());
                 values.put(DBContract.UserEntry.COLUMN_NAME_PASS, user.getPass());
                 sqLiteDatabase.insert(DBContract.UserEntry.TABLE_NAME, null, values);
-                view.post(() ->Toast.makeText(context, "Пользователь зарегистрирован <Логин доступен>", Toast.LENGTH_SHORT).show());
             }
-            sqLiteDatabase.close();
-        }).start();
+        } else {
+            values.put(DBContract.UserEntry.COLUMN_NAME_LOGIN, user.getLogin());
+            values.put(DBContract.UserEntry.COLUMN_NAME_PASS, user.getPass());
+            sqLiteDatabase.insert(DBContract.UserEntry.TABLE_NAME, null, values);
+        }
+        sqLiteDatabase.close();
+        return message;
     }
 
     public List<User> getAllUsers() {
@@ -120,22 +114,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return userLog;
     }
 
-    public void updatePassword(String login, String newPass) {
+    public String updatePassword(String login, String newPass) {
 
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        String message = "null";
+        String userData;
 
         values.put(DBContract.UserEntry.COLUMN_NAME_PASS, newPass);
 
         sqLiteDatabase.update(DBContract.UserEntry.TABLE_NAME, values, DBContract.UserEntry.COLUMN_NAME_LOGIN + "=?", new String[]{login});
+        userData = getUser(login);
+        if(!userData.equals("null")){
+            String[] cmpData = userData.split(" ");
+            if (cmpData[1].equals(newPass)){
+                Log.e("cmpPass", cmpData[1]);
+                message = "Пароль изменен";
+            }else{
+                message = "Пароль не изменен";
+            }
+        }
         sqLiteDatabase.close();
+        return message;
     }
-    public void deleteUser(String login){
+    public String deleteUser(String login){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        String message = "null";
+        String userData;
 
         sqLiteDatabase.delete(DBContract.UserEntry.TABLE_NAME, DBContract.UserEntry.COLUMN_NAME_LOGIN + "=?", new String[]{login});
+        userData = getUser(login);
+        if(userData.equals("null")) {
+            message = "Пользователь удален";
+        }else{
+            message = "Ошибка!";
+        }
+
         sqLiteDatabase.close();
-
+        return message;
     }
-
 }
