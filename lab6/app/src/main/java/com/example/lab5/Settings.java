@@ -63,22 +63,22 @@ public class Settings extends AppCompatActivity implements View.OnClickListener{
     }
 
     public void updatePass(){
-        new Thread(() -> {
-            Log.i("Thread_Setting", Thread.currentThread().getName());
+        //new Thread(() -> {
+            //Log.i("Thread_Setting", Thread.currentThread().getName());
             String passwordNew = newPass.getText().toString();
             if(pass.equals(oldPass.getText().toString()))
                 db.updatePassword(log, passwordNew);
-        }).start();
+        //}).start();
     }
     public void deleteUserPref(){
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear().commit();
 
-        new Thread(() -> {
-            Log.i("Thread_Setting", Thread.currentThread().getName());
+        //new Thread(() -> {
+            //Log.i("Thread_Setting", Thread.currentThread().getName());
             db.deleteUser(log);
             Intent intent = new Intent(Settings.this, MainActivity.class);
             startActivity(intent);
-        }).start();
+        //}).start();
     }
 }

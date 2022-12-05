@@ -156,7 +156,7 @@ public class MainActivity2 extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             listView.setAdapter(adapter);
         }
-        new Thread(() -> {
+        //new Thread(() -> {
             Log.i("Thread_MainAct_2", Thread.currentThread().getName());
             userList = db.getAllUsers();
             if(userList.size() != 0) {
@@ -168,7 +168,7 @@ public class MainActivity2 extends AppCompatActivity {
                     listView.setAdapter(adapter);
                 }
             }
-        }).start();
+        //}).start();
     }
     public void add(View view){
         EditText editText = findViewById(R.id.edit);

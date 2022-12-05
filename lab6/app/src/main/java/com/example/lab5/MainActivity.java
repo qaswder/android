@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.lab5.db.DatabaseHandler;
 import com.example.lab5.db.User;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final static String TAG = "MainActivity";
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     DatabaseHandler db;
     SharedPreferences preferences;
 
+    List<User> userList;
     final String STATE = "state";
     int state = 0;
     int count = 0;
@@ -61,44 +64,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.e("count", String.valueOf(count));
                     break;
                 case R.id.singUp:
-                    new Thread(() -> {
-                        Log.i("Thread_MainAct_1_Sup", Thread.currentThread().getName());
-                        String messageAdd = db.addUser(new User(login.getText().toString(), pass.getText().toString()));
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if(messageAdd.equals("Логин доступен")){
-                            view.post(() ->Toast.makeText(MainActivity.this, "Пользователь зарегистрирован <Логин доступен>", Toast.LENGTH_SHORT).show());
-                        }
-                        else{
-                            view.post(() ->Toast.makeText(MainActivity.this, messageAdd, Toast.LENGTH_SHORT).show());
-                        }
-                    }).start();
+                    db.addUser(new User(login.getText().toString(), pass.getText().toString()), view);
                     break;
                 case R.id.singIn:
-                    new Thread(() -> {
-                        Log.i("Thread_MainAct_1_Sin", Thread.currentThread().getName());
+                    //new Thread(() -> {
+                        //Log.i("Thread_MainAct_1_Sin", Thread.currentThread().getName());
                         int condition = 0;
                         String thisLoginUser = login.getText().toString();
                         String passCmp= pass.getText().toString();
-
-                        String dataUser = db.getUser(thisLoginUser);
-
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                        String[] cmpData = new String[1];
+                        userList = db.getUser(thisLoginUser);
+                    if(userList.size() != 0) {
+                        for (User user : userList) {
+                            String log = user.getLogin() + " " + user.getPass();
+                            cmpData = log.split(" ");
                         }
-                        if(!dataUser.equals("null")){
-                            String[] cmpData = dataUser.split(" ");
+                    }
+                        //if(!userList.equals("null")){
+
 
                             if(cmpData[0].equals(thisLoginUser)){
                                 Log.e("cmplog", cmpData[0]);
                                 condition += 1;
                             }else{
-                                view.post(() ->Toast.makeText(MainActivity.this, "Неверный логин", Toast.LENGTH_SHORT).show());
+                                Toast.makeText(MainActivity.this, "Неверный логин", Toast.LENGTH_SHORT).show();
                                 condition = 0;
                             }
 
@@ -106,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 Log.e("cmppass", cmpData[1]);
                                 condition += 1;
                             }else{
-                                view.post(() ->Toast.makeText(MainActivity.this, "Неверный пароль", Toast.LENGTH_SHORT).show());
+                                Toast.makeText(MainActivity.this, "Неверный пароль", Toast.LENGTH_SHORT).show();
                                 condition = 0;
                             }
 
@@ -115,15 +104,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 intent.putExtra(LOGIN, cmpData[0]);
                                 intent.putExtra(PASS, cmpData[1]);
                                 startActivity(intent);
-                                login.post(() ->login.setText(""));
-                                pass.post(() ->pass.setText(""));
+                                login.setText("");
+                                pass.setText("");
                             }
-                            Log.e("cmp", cmpData[0] +" "+ cmpData[1]);
-                        }
-                        else{
+                            //Log.e("cmp", cmpData[0] +" "+ cmpData[1]);
+                        //}
+                        /*else{
                             view.post(() -> Toast.makeText(MainActivity.this, "Неверные данные", Toast.LENGTH_SHORT).show());
-                        }
-                    }).start();
+                        }*/
+                   // }).start();
                     break;
                 default:
                     break;
