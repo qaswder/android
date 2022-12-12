@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.e("count", String.valueOf(count));
                     break;
                 case R.id.singUp:
-                    db.addUser(new User(login.getText().toString(), pass.getText().toString()), view);
+                    db.addUser(new User(login.getText().toString(), pass.getText().toString()), view, singUp);
                     break;
                 case R.id.singIn:
                     //new Thread(() -> {

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -40,12 +41,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void addUser(User user, View view) {
+    int i=0;
+
+    public void addUser(User user, View view, Button button) {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                button.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        button.setEnabled(false);
+                    }
+                });
                 DatabaseHandler.this.view = view;
-                Log.i("Thread_DB", Thread.currentThread().getName() + " start");
+                i++;
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.i("Thread_DB"+Integer.toString(i), Thread.currentThread().getName() + " start");
                 SQLiteDatabase sqLiteDatabase = DatabaseHandler.this.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 boolean flag = true;
@@ -75,6 +91,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     view.post(() -> Toast.makeText(context, "Пользователь зарегистрирован <Логин доступен>", Toast.LENGTH_SHORT).show());
                 }
                 sqLiteDatabase.close();
+                button.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        button.setEnabled(true);
+                    }
+                });
             }
         }).start();
     }
@@ -135,6 +158,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Runnable runThr = new Runnable(){
             @Override
             public  void run(){
+                Log.i("ThreadDB", "Thread Start");
                 String selectQuery = "SELECT * FROM " + DBContract.UserEntry.TABLE_NAME + " WHERE " + DBContract.UserEntry.COLUMN_NAME_LOGIN + " =?";
 
                 Cursor cursor = db.rawQuery(selectQuery, new String[]{login});
@@ -149,10 +173,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         } while (cursor.moveToNext());
                     }
                 }
-
+                Log.i("ThreadDB", "User");
                 cursor.close();
             }
         };
+            Log.i("ThreadDB", "Thread 1");
         Thread thread = new Thread(runThr);
         thread.start();
         try {
@@ -160,6 +185,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        Log.i("ThreadDB", "return");
 
 /*        String selectQuery = "SELECT * FROM " + DBContract.UserEntry.TABLE_NAME + " WHERE " + DBContract.UserEntry.COLUMN_NAME_LOGIN + " =?";
         String userLog = null;
